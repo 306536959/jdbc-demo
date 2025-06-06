@@ -366,8 +366,6 @@
                     option.classList.remove('active');
                 }
             });
-
-            strategyInput.value = options[index].textContent;
         }
 
         // 选择选项
@@ -653,7 +651,6 @@
             // 定位提示框
             const rect = sqlInput.getBoundingClientRect();
             const cursorRect = getCursorPosition(sqlInput, cursorPos);
-
             suggestionsContainer.style.left = `${rect.left + cursorRect.left}px`;
             suggestionsContainer.style.top = `${rect.top + cursorRect.top + cursorRect.height}px`;
             suggestionsContainer.style.display = 'block';
@@ -692,6 +689,7 @@
 
             // 确保总是创建span元素
             div.innerHTML = div.innerHTML.replace(/\n/g, '<br>');
+
             const span = document.createElement('span');
             span.textContent = ' ';
             div.appendChild(span);

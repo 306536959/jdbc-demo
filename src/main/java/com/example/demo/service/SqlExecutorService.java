@@ -129,4 +129,8 @@ public class SqlExecutorService {
     public boolean isConnected(String strategyId) {
         return strategyId != null && connectionStatus.getOrDefault(strategyId, false);
     }
+
+    public DataSource getDataSource(String strategyId) {
+        return dataSources.get(strategyId);
+    }
 }
