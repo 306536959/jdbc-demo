@@ -1,0 +1,19 @@
+#enableMismatchLogging : false # 是否打开匹配失败日
+#strategyCode : UBCLPB00ECJF # pg策略编号
+#strategyCode : NIPGCJVQM8QU	 # mysql策略编号
+#strategyCode : QG238A2JFUFS #高斯数据库测试
+#strategyCode : WPPJQY8J38PS #ocenbase数据库测试
+strategyCode : 41PVNYCLVLAE #本地mysql策略编号
+#configUrl : http://192.168.10.97:9089/enc/v1/gatewayStrategy/getConfig # 策略配置地址
+configUrl : http://127.0.0.1:8084/v1/gatewayStrategy/getConfig
+#configUrl : https://m1.apifoxmock.com/m2/5550113-5227108-default/250637533?apifoxApiId=250637533
+standalone : false #是否离线部署
+localStorage : true #是否本地存储在线配置
+localFalseRetry  : true #是否开启本地配置重试获取
+#localConfigPath : C:\\Users\\xuao\\IdeaProjects\\sharding-sphere-0115\\proxy\\bootstrap\\src\\main\\resources\\conf\\database-config.json
+#standaloneConfigPath : C:\\Users\\xuao\\IdeaProjects\\sharding-sphere-0115\\proxy\\bootstrap\\src\\main\\resources\\conf\\database-config.json  #离线策略配置文件路径
+#http://192.168.10.97:9089/enc/v1/api/gatewayStrategy/getConfig
+localConfigPath: ./database-config.json
+standaloneConfigPath: ./database-config.json
+strategyEnabledByUrl : true
+#proxyDefaultPort : 3307   #默认端口

@@ -1,0 +1,40 @@
+plugins {
+    id 'org.springframework.boot' version '3.0.2'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'java'
+}
+
+group = 'org.apache.shardingsphere'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://maven.aliyun.com/repository/spring')
+    }
+    mavenCentral()
+}
+ext {
+    jacksonVersion = '2.15.3'
+}
+dependencies {
+    implementation files("libs/shardingsphere-jdbc-5.5.3-SNAPSHOT-shaded.jar")
+    implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${jacksonVersion}"
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'mysql:mysql-connector-java'
+    implementation 'org.postgresql:postgresql'
+    //mybatis-spring-boot-starter
+    implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.5'
+
+    //lombok
+    compileOnly 'org.projectlombok:lombok'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
