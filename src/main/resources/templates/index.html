@@ -168,13 +168,35 @@
         .sql-keyword { color: #007bff; }
         .sql-table { color: #28a745; }
         .sql-column { color: #6c757d; }
+        .db-info {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+
+        .table-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .table-list li {
+            padding: 6px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table-list li:hover {
+            background-color: #f0f0f0;
+        }
+
     </style>
 </head>
 <body>
 <div class="container">
     <h1>SQL执行器</h1>
 
-    <form method="post" action="/connect">
+    <form style="width: 50%" method="post" action="/connect">
         <div class="form-group datalist-container">
             <label for="strategyId">策略ID</label>
             <input type="text" id="strategyId" name="strategyId"
@@ -185,7 +207,6 @@
         </div>
         <button type="submit">连接数据源</button>
     </form>
-
     <!-- 连接状态 -->
     <div class="connection-status" th:if="${connectionSuccess != null}">
         <span th:if="${connectionSuccess}" class="connection-success">
@@ -194,6 +215,14 @@
         <span th:if="${!connectionSuccess}" class="connection-failure">
             <strong>连接失败:</strong> <span th:text="${connectionMessage}"></span>
         </span>
+    </div>
+    <!-- 数据库信息 -->
+    <div id="dbInfo" class="db-info" style="margin-top: 20px;"></div>
+
+    <!-- 表列表 -->
+    <div id="tableListContainer" style="margin-top: 20px;">
+        <h3>数据库表</h3>
+        <ul id="tableList" class="table-list"></ul>
     </div>
 
     <!-- 查询表单 -->

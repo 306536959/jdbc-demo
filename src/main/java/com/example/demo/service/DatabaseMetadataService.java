@@ -91,6 +91,21 @@ public class DatabaseMetadataService {
         }
 
         metadata.put("tables", tables);
+        //  添加其他元数据信息
+        metadata.put("databaseName", catalog);
+
+        metadata.put("driverName", metaData.getDriverName());
+        metadata.put("driverVersion", metaData.getDriverVersion());
+        metadata.put("databaseProductName", metaData.getDatabaseProductName());
+        metadata.put("databaseProductVersion", metaData.getDatabaseProductVersion());
+        metadata.put("url", metaData.getURL());
+        metadata.put("userName", metaData.getUserName());
+        metadata.put("timeZone", TimeZone.getDefault().getID());
+        metadata.put("timeZoneOffset", TimeZone.getDefault().getRawOffset());
+        metadata.put("timeZoneDSTOffset", TimeZone.getDefault().getDSTSavings());
+        metadata.put("timeZoneID", TimeZone.getDefault().getID());
+        metadata.put("timeZoneOffsetMillis", TimeZone.getDefault().getOffset(System.currentTimeMillis()));
+        metadata.put("timeZoneDSTOffsetMillis", TimeZone.getDefault().getDSTSavings());
         return metadata;
     }
 
