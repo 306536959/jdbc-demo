@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.StrategyInfo;
 import com.example.demo.service.StrategyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +14,7 @@ public class StrategyController {
 @Autowired
 private StrategyService strategyService;
     @GetMapping("/api/strategies")
-    public List<String> getAvailableStrategies() {
+    public List<StrategyInfo> getAvailableStrategies() {
 
         return strategyService.getAvailableStrategies();
     }

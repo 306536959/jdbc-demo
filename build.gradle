@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '3.0.2'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'java'
+    id 'war' // 添加 war 插件
 }
 
 group = 'org.apache.shardingsphere'
@@ -15,9 +16,11 @@ repositories {
     }
     mavenCentral()
 }
+
 ext {
     jacksonVersion = '2.15.3'
 }
+
 dependencies {
     implementation files("libs/shardingsphere-jdbc-5.5.3-SNAPSHOT-shaded.jar")
     implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
@@ -28,13 +31,19 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'mysql:mysql-connector-java'
     implementation 'org.postgresql:postgresql'
-    //mybatis-spring-boot-starter
     implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.5'
-
-    //lombok
     compileOnly 'org.projectlombok:lombok'
+
+    dependencies {
+        annotationProcessor 'org.projectlombok:lombok'
+    }
+
 }
+
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+tasks.withType(JavaCompile) {
+    options.annotationProcessorPath = configurations.annotationProcessor
 }
