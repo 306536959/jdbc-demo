@@ -1,7 +1,7 @@
 window.addEventListener('DOMContentLoaded', function () {
     const strategyInput = document.getElementById('strategyId');
     const datalistOptions = document.getElementById('datalistOptions');
-    let allStrategies = [];
+    let allStrategies = []; // 存储策略对象 { strategyCode, strategyName }
     let currentActiveIndex = -1;
 
     // 加载策略列表
@@ -19,6 +19,10 @@ window.addEventListener('DOMContentLoaded', function () {
             const selectedValue = strategyInput.getAttribute('th:value');
             if (selectedValue) {
                 strategyInput.value = selectedValue;
+                const selectedStrategy = strategies.find(s => s.strategyCode === selectedValue);
+                if (selectedStrategy) {
+                    strategyInput.setAttribute('title', `${selectedStrategy.strategyName} (${selectedStrategy.strategyCode})`);
+                }
             }
         })
         .catch(error => {
@@ -27,13 +31,13 @@ window.addEventListener('DOMContentLoaded', function () {
         });
 
     // 输入事件处理
-    strategyInput.addEventListener('input', function() {
+    strategyInput.addEventListener('input', function () {
         const query = this.value.toLowerCase();
         showOptions(query);
     });
 
     // 焦点事件处理
-    strategyInput.addEventListener('focus', function() {
+    strategyInput.addEventListener('focus', function () {
         if (this.value.trim()) {
             showOptions(this.value.toLowerCase());
         } else {
@@ -42,7 +46,7 @@ window.addEventListener('DOMContentLoaded', function () {
     });
 
     // 失去焦点事件处理
-    strategyInput.addEventListener('blur', function() {
+    strategyInput.addEventListener('blur', function () {
         // 延迟隐藏选项，以便能够点击选项
         setTimeout(() => {
             datalistOptions.style.display = 'none';
@@ -50,13 +54,13 @@ window.addEventListener('DOMContentLoaded', function () {
     });
 
     // 键盘导航
-    strategyInput.addEventListener('keydown', function(e) {
+    strategyInput.addEventListener('keydown', function (e) {
         const options = datalistOptions.querySelectorAll('.datalist-option');
         const optionsCount = options.length;
 
         if (optionsCount === 0) return;
 
-        switch(e.key) {
+        switch (e.key) {
             case 'ArrowDown':
                 e.preventDefault();
                 currentActiveIndex = (currentActiveIndex + 1) % optionsCount;
@@ -84,7 +88,10 @@ window.addEventListener('DOMContentLoaded', function () {
         datalistOptions.innerHTML = '';
 
         const filteredStrategies = query
-            ? allStrategies.filter(s => s.toLowerCase().includes(query))
+            ? allStrategies.filter(s =>
+                s.strategyName.toLowerCase().includes(query) ||
+                s.strategyCode.toLowerCase().includes(query)
+            )
             : allStrategies;
 
         if (filteredStrategies.length === 0) {
@@ -96,15 +103,18 @@ window.addEventListener('DOMContentLoaded', function () {
         filteredStrategies.forEach(strategy => {
             const option = document.createElement('div');
             option.className = 'datalist-option';
-            option.textContent = strategy;
+            option.dataset.value = strategy.strategyCode; // 实际值
+            option.textContent = `${strategy.strategyName} (${strategy.strategyCode})`;
 
             // 高亮匹配的文本
             if (query) {
                 const regex = new RegExp(`(${query})`, 'gi');
-                option.innerHTML = strategy.replace(regex, '<span style="font-weight:bold;background-color:#ffffcc">$1</span>');
+                const highlightedName = strategy.strategyName.replace(regex, '<span style="font-weight:bold;background-color:#ffffcc">$1</span>');
+                const highlightedCode = strategy.strategyCode.replace(regex, '<span style="font-weight:bold;background-color:#ffffcc">$1</span>');
+                option.innerHTML = `${highlightedName} (<span class="sql-column">${highlightedCode}</span>)`;
             }
 
-            option.addEventListener('click', function() {
+            option.addEventListener('click', function () {
                 selectOption(this);
             });
 
@@ -122,19 +132,18 @@ window.addEventListener('DOMContentLoaded', function () {
         options.forEach((option, i) => {
             if (i === index) {
                 option.classList.add('active');
-                // 滚动到可见区域
                 option.scrollIntoView({ block: 'nearest' });
             } else {
                 option.classList.remove('active');
             }
         });
 
-        strategyInput.value = options[index].textContent;
+        strategyInput.value = options[index].dataset.value;
     }
 
     // 选择选项
     function selectOption(option) {
-        strategyInput.value = option.textContent;
+        strategyInput.value = option.dataset.value;
         datalistOptions.style.display = 'none';
         strategyInput.focus(); // 保持焦点
     }
