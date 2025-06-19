@@ -146,53 +146,5 @@ window.addEventListener('DOMContentLoaded', function () {
         strategyInput.value = option.dataset.value;
         datalistOptions.style.display = 'none';
         strategyInput.focus(); // 保持焦点
-
-        const selectedStrategyId = option.dataset.value;
-
-        // 请求数据库元数据
-        fetch(`/api/database/metadata?strategyId=${selectedStrategyId}`)
-            .then(response => {
-                if (!response.ok) throw new Error('加载元数据失败');
-                return response.json();
-            })
-            .then(metadata => {
-                displayDbInfo(metadata);
-                displayTables(metadata);
-            })
-            .catch(error => {
-                console.error('加载元数据失败:', error);
-                alert('无法加载数据库结构，请检查后端服务是否正常');
-            });
     }
-    function displayDbInfo(metadata) {
-        const container = document.getElementById('dbInfo');
-        container.innerHTML = `
-        <p><strong>IP地址:</strong> ${metadata.url.match(/\/\/([^:\/]+)/)?.[1] || '未知'}</p>
-        <p><strong>数据库类型:</strong> ${metadata.databaseProductName || 'MySQL'}</p>
-        <p><strong>数据库名称:</strong> ${metadata.catalog || metadata.databaseName || '未知'}</p>
-        <p><strong>用户名:</strong> ${metadata.userName || 'root'}</p>
-        <p><strong>表数量:</strong> ${metadata.tables ? metadata.tables.length : 0}</p>
-    `;
-    }
-    function displayTables(metadata) {
-        const tableListContainer = document.getElementById('tableList');
-        const sqlQueryInput = document.getElementById('sqlQuery');
-        tableListContainer.innerHTML = '';
-
-        if (!metadata.tables || metadata.tables.length === 0) {
-            tableListContainer.innerHTML = '<li class="text-muted">没有可用的表</li>';
-            return;
-        }
-
-        metadata.tables.forEach(table => {
-            const li = document.createElement('li');
-            li.className = 'table-item';
-            li.textContent = table.name;
-            li.addEventListener('click', () => {
-                sqlQueryInput.value = `SELECT * FROM ${table.name};`;
-            });
-            tableListContainer.appendChild(li);
-        });
-    }
-
 });

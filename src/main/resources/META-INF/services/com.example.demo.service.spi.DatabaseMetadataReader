@@ -1,0 +1,4 @@
+com.example.demo.service.spi.impl.MySqlMetadataReader
+com.example.demo.service.spi.impl.PostgreSqlMetadataReader
+com.example.demo.service.spi.impl.DB2MetadataReader
+com.example.demo.service.spi.impl.SqlServerMetadataReader

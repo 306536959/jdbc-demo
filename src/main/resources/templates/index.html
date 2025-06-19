@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>SQL执行器</title>
+    <title>数据库加密服务jdbc演示</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -10,6 +10,7 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -18,17 +19,21 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             color: #333;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
+
         input, textarea {
             width: 100%;
             padding: 8px;
@@ -36,10 +41,12 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
+
         textarea {
             height: 120px;
             font-family: monospace;
         }
+
         button {
             background-color: #4CAF50;
             color: white;
@@ -49,63 +56,62 @@
             cursor: pointer;
             margin-right: 10px;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
         .error {
             color: #f44336;
             margin: 10px 0;
         }
+
         .success {
             color: #4CAF50;
             margin: 10px 0;
         }
+
         .connection-status {
             padding: 10px;
             margin: 10px 0;
             border-radius: 4px;
         }
+
         .connection-success {
             background-color: #e8f5e9;
             color: #2e7d32;
         }
+
         .connection-failure {
             background-color: #ffebee;
             color: #c62828;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
+
         table, th, td {
             border: 1px solid #ddd;
             padding: 8px;
         }
+
         th {
             background-color: #f2f2f2;
             text-align: left;
         }
+
         tr:nth-child(even) {
             background-color: #f9f9f9;
-        }
-        .pagination {
-            margin-top: 20px;
-            text-align: center;
-        }
-        .pagination button {
-            background-color: #f1f1f1;
-            color: black;
-        }
-        .pagination button.active {
-            background-color: #4CAF50;
-            color: white;
         }
 
         /* 增强 datalist 样式 */
         .datalist-container {
             position: relative;
         }
+
         .datalist-options {
             position: absolute;
             z-index: 10;
@@ -116,58 +122,28 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             background-color: white;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             max-height: 200px;
             overflow-y: auto;
             display: none;
         }
+
         .datalist-option {
             padding: 8px;
             cursor: pointer;
             border-bottom: 1px solid #eee;
         }
+
         .datalist-option:last-child {
             border-bottom: none;
         }
+
         .datalist-option:hover,
         .datalist-option.active {
             background-color: #f0f0f0;
         }
 
-        /* SQL 提示样式 */
-        .sql-suggestions {
-            position: absolute;
-            z-index: 1000;
-            top: 100%;
-            left: 0;
-            width: 250px;
-            margin-top: 4px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            max-height: 200px;
-            overflow-y: auto;
-            display: none;
-        }
-        .sql-function {
-            color: #6f42c1; /* 紫色 */
-        }
-
-        .sql-suggestion {
-            padding: 6px 12px;
-            cursor: pointer;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-        }
-        .sql-suggestion:hover,
-        .sql-suggestion.active {
-            background-color: #f0f0f0;
-        }
-        .sql-keyword { color: #007bff; }
-        .sql-table { color: #28a745; }
-        .sql-column { color: #6c757d; }
+        /* 数据库信息展示样式 */
         .db-info {
             background-color: #f9f9f9;
             padding: 15px;
@@ -190,23 +166,124 @@
             background-color: #f0f0f0;
         }
 
+        .sql-suggestion {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+
+        .sql-suggestion:hover,
+        .sql-suggestion.active {
+            background-color: #f0f0f0;
+        }
+
+        .sql-keyword {
+            color: #007acc;
+            font-weight: bold;
+        }
+
+        .sql-table {
+            color: #28a745;
+        }
+
+        .sql-column {
+            color: #6f42c1;
+        }
+
+        .sql-function {
+            color: #e83e8c;
+        }
+
+        .text-muted {
+            color: #868e96;
+            font-size: 0.8em;
+        }
+
+        #sqlSuggestions {
+            position: absolute;
+            border: 1px solid #ccc;
+            background-color: white;
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+        }
+        .db-info-row {
+            display: flex;
+            flex-wrap: wrap; /* 允许换行 */
+            gap: 16px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .db-info-row span {
+            background-color: #f9f9f9;
+            padding: 6px 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+
+        /* 可选：用竖线分隔字段 */
+        .db-info-row span:not(:last-child)::after {
+            content: " |";
+            margin-left: 4px;
+            color: #ccc;
+        }
+
+        .db-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .db-info-grid div {
+            background-color: #f9f9f9;
+            padding: 8px 12px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+
+        .text-muted {
+            color: #999;
+        }
+
+        .text-sm {
+            font-size: 0.8em;
+        }
+
+        .sql-table {
+            color: #28a745; /* 绿色 */
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>SQL执行器</h1>
+    <h1>数据库加密服务jdbc演示</h1>
 
-    <form style="width: 50%" method="post" action="/connect">
-        <div class="form-group datalist-container">
-            <label for="strategyId">策略ID</label>
-            <input type="text" id="strategyId" name="strategyId"
-                   th:value="${connectionInfo.strategyId}" required
-                   autocomplete="off">
-            <div id="datalistOptions" class="datalist-options"></div>
 
-        </div>
-        <button type="submit">连接数据源</button>
-    </form>
+        <form style="width: 50%" method="post" action="/connect" id="connectForm">
+            <div class="form-group datalist-container">
+                <label for="strategyId">策略ID</label>
+                <input type="text" id="strategyId" name="strategyId"
+                       th:value="${connectionInfo.strategyId}" required
+                       autocomplete="off">
+                <div id="datalistOptions" class="datalist-options"></div>
+            </div>
+            <label>代码提示目前仅支持 MySQL PostgreSQL DB2 SqlServer</label>
+            <button type="submit">连接数据源</button>
+        </form>
+
+        <!-- 数据库信息 -->
+        <div id="dbInfo" class="db-info" style="margin-top: 20px;"></div>
+
+    <!-- 表列表 -->
+    <div id="tableListContainer" style="margin-top: 20px;">
+        <h3>数据库表</h3>
+        <ul id="tableList" class="table-list"></ul>
+    </div>
+
     <!-- 连接状态 -->
     <div class="connection-status" th:if="${connectionSuccess != null}">
         <span th:if="${connectionSuccess}" class="connection-success">
@@ -216,14 +293,6 @@
             <strong>连接失败:</strong> <span th:text="${connectionMessage}"></span>
         </span>
     </div>
-    <!-- 数据库信息 -->
-    <div id="dbInfo" class="db-info" style="margin-top: 20px;"></div>
-
-    <!-- 表列表 -->
-    <div id="tableListContainer" style="margin-top: 20px;">
-        <h3>数据库表</h3>
-        <ul id="tableList" class="table-list"></ul>
-    </div>
 
     <!-- 查询表单 -->
     <form method="post" action="/execute" th:if="${connectionSuccess != null and connectionSuccess}">
@@ -231,8 +300,8 @@
 
         <div class="form-group datalist-container" style="position: relative;">
             <label for="sqlQuery">SQL查询</label>
-            <textarea id="sqlQuery" name="sqlQuery" required th:text="${sqlQuery} ?: 'SELECT * FROM users LIMIT 10;'"></textarea>
-            <!-- SQL提示容器 -->
+            <textarea id="sqlQuery" name="sqlQuery" required
+                      th:text="${sqlQuery} ?: '-- 请输入有效的SQL查询语句'"></textarea>
             <div id="sqlSuggestions" class="sql-suggestions"></div>
         </div>
         <button type="submit">执行SQL</button>
@@ -246,7 +315,6 @@
     <!-- 查询结果 -->
     <div th:if="${queryResult != null}">
         <h2>查询结果</h2>
-
         <div th:if="${queryResult.hasData()}">
             <table>
                 <thead>
@@ -261,7 +329,6 @@
                 </tbody>
             </table>
         </div>
-
         <div th:if="${!queryResult.hasData()}" class="error">
             查询执行成功，但没有返回记录。
         </div>

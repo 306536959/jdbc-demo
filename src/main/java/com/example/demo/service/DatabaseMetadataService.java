@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.service.spi.DatabaseMetadataReader;
 import com.example.demo.dto.ConnectionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -7,7 +8,6 @@ import org.springframework.stereotype.Service;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -16,6 +16,10 @@ public class DatabaseMetadataService {
 
     @Autowired
     private SqlExecutorService sqlExecutorService;
+
+    // 加载所有可用的元数据读取器
+    private final ServiceLoader<DatabaseMetadataReader> metadataReaders =
+            ServiceLoader.load(DatabaseMetadataReader.class);
 
     public Map<String, Object> getDatabaseMetadata(String strategyId) {
         ConnectionInfo connectionInfo = new ConnectionInfo();
@@ -26,102 +30,37 @@ public class DatabaseMetadataService {
                 DataSource dataSource = sqlExecutorService.getDataSource(strategyId);
                 try (Connection connection = dataSource.getConnection()) {
                     DatabaseMetaData metaData = connection.getMetaData();
+                    String databaseProductName = metaData.getDatabaseProductName();
 
-                    // 提取当前连接的 catalog（数据库名称）
-                    String catalog = extractCatalogFromURL(connection.getMetaData().getURL());
+                    // 查找支持当前数据库类型的读取器
+                    DatabaseMetadataReader reader = findReader(databaseProductName);
+                    if (reader == null) {
+                        throw new SQLException("不支持的数据库类型: " + databaseProductName);
+                    }
 
-                    return extractMetadata(metaData, catalog);
+                    // 提取catalog并读取元数据
+                    String catalog = reader.extractCatalog(metaData.getURL());
+                    return reader.readMetadata(metaData, catalog);
                 }
+            } else {
+                throw new SQLException("策略ID " + strategyId + " 未连接到数据库");
             }
         } catch (SQLException e) {
+            System.err.println("获取数据库元数据失败: " + e.getMessage());
             e.printStackTrace();
-        }
-        return Collections.emptyMap();
-    }
-
-    /**
-     * 从 JDBC URL 中提取数据库名称（catalog）
-     */
-    private String extractCatalogFromURL(String jdbcUrl) throws SQLException {
-        if (jdbcUrl == null || !jdbcUrl.contains("//")) {
-            throw new SQLException("无效的 JDBC URL");
-        }
-
-        if (jdbcUrl.startsWith("jdbc:mysql:")) {
-            int lastSlashIndex = jdbcUrl.lastIndexOf("/");
-            int queryIndex = jdbcUrl.indexOf("?");
-            if (queryIndex == -1) queryIndex = jdbcUrl.length();
-            return jdbcUrl.substring(lastSlashIndex + 1, queryIndex);
-        } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
-            int startIndex = jdbcUrl.indexOf("//") + 2;
-            int slashIndex = jdbcUrl.indexOf("/", startIndex);
-            if (slashIndex != -1) {
-                return jdbcUrl.substring(slashIndex + 1);
-            } else {
-                throw new SQLException("无法从 PostgreSQL URL 提取数据库名称");
-            }
-        } else if (jdbcUrl.startsWith("jdbc:sqlserver:")) {
-            String[] parts = jdbcUrl.split(";");
-            for (String part : parts) {
-                if (part.toLowerCase().startsWith("database=")) {
-                    return part.split("=")[1];
-                }
-            }
-            throw new SQLException("SQL Server URL 中未指定 database 参数");
-        } else {
-            throw new SQLException("不支持的数据库类型");
+            return Collections.singletonMap("error", e.getMessage());
         }
     }
 
     /**
-     * 提取指定 catalog 下的表结构
+     * 查找支持指定数据库类型的读取器
      */
-    private Map<String, Object> extractMetadata(DatabaseMetaData metaData, String catalog) throws SQLException {
-        Map<String, Object> metadata = new HashMap<>();
-        List<Map<String, Object>> tables = new ArrayList<>();
-
-        try (ResultSet rs = metaData.getTables(catalog, null, null, new String[]{"TABLE"})) {
-            while (rs.next()) {
-                String tableName = rs.getString("TABLE_NAME");
-                Map<String, Object> table = new HashMap<>();
-                table.put("name", tableName);
-                table.put("columns", getColumns(metaData, catalog, tableName));
-                tables.add(table);
+    private DatabaseMetadataReader findReader(String databaseProductName) {
+        for (DatabaseMetadataReader reader : metadataReaders) {
+            if (reader.supports(databaseProductName)) {
+                return reader;
             }
         }
-
-        metadata.put("tables", tables);
-        //  添加其他元数据信息
-        metadata.put("databaseName", catalog);
-
-        metadata.put("driverName", metaData.getDriverName());
-        metadata.put("driverVersion", metaData.getDriverVersion());
-        metadata.put("databaseProductName", metaData.getDatabaseProductName());
-        metadata.put("databaseProductVersion", metaData.getDatabaseProductVersion());
-        metadata.put("url", metaData.getURL());
-        metadata.put("userName", metaData.getUserName());
-        metadata.put("timeZone", TimeZone.getDefault().getID());
-        metadata.put("timeZoneOffset", TimeZone.getDefault().getRawOffset());
-        metadata.put("timeZoneDSTOffset", TimeZone.getDefault().getDSTSavings());
-        metadata.put("timeZoneID", TimeZone.getDefault().getID());
-        metadata.put("timeZoneOffsetMillis", TimeZone.getDefault().getOffset(System.currentTimeMillis()));
-        metadata.put("timeZoneDSTOffsetMillis", TimeZone.getDefault().getDSTSavings());
-        return metadata;
-    }
-
-    /**
-     * 获取指定表的字段信息
-     */
-    private List<Map<String, Object>> getColumns(DatabaseMetaData metaData, String catalog, String tableName) throws SQLException {
-        List<Map<String, Object>> columns = new ArrayList<>();
-        try (ResultSet rs = metaData.getColumns(catalog, null, tableName, null)) {
-            while (rs.next()) {
-                String columnName = rs.getString("COLUMN_NAME");
-                Map<String, Object> column = new HashMap<>();
-                column.put("name", columnName);
-                columns.add(column);
-            }
-        }
-        return columns;
+        return null;
     }
 }

@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.ConnectionInfo;
 import com.example.demo.dto.QueryResult;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shardingsphere.driver.api.yaml.YamlShardingSphereDataSourceFactory;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Service
 public class SqlExecutorService {
 
@@ -30,6 +32,9 @@ public class SqlExecutorService {
         DataSource dataSource = YamlShardingSphereDataSourceFactory.createDataSource(url);
 
         try (Connection testConn = dataSource.getConnection()) {
+            //获取默认模式名称
+            String defaultSchema = testConn.getSchema();
+            log.info("默认模式名称: " + defaultSchema);
             boolean isValid = testConn != null && !testConn.isClosed();
             if (isValid) {
                 dataSources.put(strategyId, dataSource);
@@ -56,7 +61,12 @@ public class SqlExecutorService {
 
         QueryResult result = new QueryResult();
         try (Connection conn = getConnection(connectionInfo);
+             //当前模式名称是
              Statement stmt = conn.createStatement()) {
+            String currentSchema = conn.getSchema();
+            if (currentSchema != null && !currentSchema.isEmpty()) {
+                log.info("当前模式名称: " + currentSchema);
+            }
             if (sqlQuery.trim().toUpperCase().startsWith("SELECT")) {
                 try (ResultSet rs = stmt.executeQuery(sqlQuery)) {
                     processResultSet(rs, result);

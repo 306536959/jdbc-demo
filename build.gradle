@@ -31,7 +31,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'mysql:mysql-connector-java'
     implementation 'org.postgresql:postgresql'
+    //导入sqlserver
+    implementation 'com.microsoft.sqlserver:mssql-jdbc'
     implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.5'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     compileOnly 'org.projectlombok:lombok'
 
     dependencies {
@@ -46,4 +49,7 @@ tasks.named('test') {
 }
 tasks.withType(JavaCompile) {
     options.annotationProcessorPath = configurations.annotationProcessor
+}
+war {
+    archiveFileName = 'demo.war'
 }

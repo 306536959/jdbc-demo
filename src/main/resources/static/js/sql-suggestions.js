@@ -42,6 +42,13 @@ window.addEventListener('DOMContentLoaded', function() {
             })
             .then(metadata => {
                 databaseMetadata = metadata;
+                try {
+                    displayDbInfo(metadata);
+                    displayTables(metadata);
+                } catch (e) {
+                    console.error('渲染失败:', e);
+                }
+
                 console.log('数据库元数据加载成功', metadata);
             })
             .catch(error => {
@@ -414,4 +421,52 @@ window.addEventListener('DOMContentLoaded', function() {
                 break;
         }
     });
+    // 渲染数据库信息
+    function displayDbInfo(metadata) {
+        console.log('开始渲染数据库信息', metadata);
+        const container = document.getElementById('dbInfo');
+        const urlMatch = metadata.url.match(/\/\/([^:\/]+)/);
+        const ipAddress = urlMatch ? urlMatch[1] : '未知';
+
+        container.innerHTML = `
+        <div class="db-info">
+            <h3>数据库信息</h3>
+            <div class="db-info-row">
+                <span><strong>IP地址:</strong> ${ipAddress}</span>
+                <span><strong>数据库类型:</strong> ${metadata.databaseProductName || 'MySQL'}</span>
+                <span><strong>数据库名称:</strong> ${metadata.databaseName || '未知'}</span>
+                <span><strong>用户名:</strong> ${metadata.userName || 'root'}</span>
+                <span><strong>表数量:</strong> ${metadata.tables ? metadata.tables.length : 0}</span>
+                <span><strong>版本:</strong> ${metadata.databaseProductVersion || '未知'}</span>
+            </div>
+        </div>
+    `;
+    }
+
+
+    // 渲染表名
+    function displayTables(metadata) {
+        console.log('开始渲染表名列表', metadata);
+        const tableListContainer = document.getElementById('tableList');
+        const sqlQueryInput = document.getElementById('sqlQuery');
+        tableListContainer.innerHTML = '';
+
+        if (!metadata.tables || metadata.tables.length === 0) {
+            tableListContainer.innerHTML = '<li class="text-muted">没有可用的表</li>';
+            return;
+        }
+
+        metadata.tables.forEach(table => {
+            const li = document.createElement('li');
+            li.className = 'table-item';
+            li.innerHTML = `
+                <span class="sql-table">${table.name}</span> 
+                <span class="text-muted text-sm">(${table.columns ? table.columns.length : 0}列)</span>
+            `;
+            li.addEventListener('click', () => {
+                sqlQueryInput.value = `SELECT * FROM ${table.name};`;
+            });
+            tableListContainer.appendChild(li);
+        });
+    }
 });
