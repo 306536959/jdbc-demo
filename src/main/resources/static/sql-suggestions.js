@@ -31,11 +31,10 @@ window.addEventListener('DOMContentLoaded', function() {
         // 条件函数
         'IFNULL(?, ?)', 'COALESCE(?, ?)', 'CASE WHEN THEN END'
     ];
-
     // 连接成功后获取数据库元数据
     if (document.querySelector('.connection-success')) {
         const strategyId = document.querySelector('input[name="strategyId"]').value;
-        fetch(`/api/database/metadata?strategyId=${strategyId}`)
+        fetch(`/demo/api/database/metadata?strategyId=${strategyId}`)
             .then(response => {
                 if (!response.ok) throw new Error('获取数据库元数据失败');
                 return response.json();
@@ -376,6 +375,7 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 
     // 事件监听
+
     sqlInput.addEventListener('input', showSuggestions);
     sqlInput.addEventListener('click', showSuggestions);
     sqlInput.addEventListener('focus', showSuggestions);

@@ -263,7 +263,7 @@
     <h1>数据库加密服务jdbc演示</h1>
 
 
-        <form style="width: 50%" method="post" action="/connect" id="connectForm">
+        <form style="width: 50%" method="post"  th:action="@{/connect}" id="connectForm">
             <div class="form-group datalist-container">
                 <label for="strategyId">策略ID</label>
                 <input type="text" id="strategyId" name="strategyId"
@@ -295,17 +295,19 @@
     </div>
 
     <!-- 查询表单 -->
-    <form method="post" action="/execute" th:if="${connectionSuccess != null and connectionSuccess}">
+    <form method="post" th:action="@{/execute}">
         <input type="hidden" name="strategyId" th:value="${connectionInfo.strategyId}">
 
         <div class="form-group datalist-container" style="position: relative;">
             <label for="sqlQuery">SQL查询</label>
-            <textarea id="sqlQuery" name="sqlQuery" required
-                      th:text="${sqlQuery} ?: '-- 请输入有效的SQL查询语句'"></textarea>
+                <textarea id="sqlQuery" style="display:none"></textarea>
             <div id="sqlSuggestions" class="sql-suggestions"></div>
         </div>
         <button type="submit">执行SQL</button>
     </form>
+
+
+
 
     <!-- 查询错误 -->
     <div class="error" th:if="${queryError != null}">
@@ -335,8 +337,9 @@
     </div>
 </div>
 
-<!-- 引入独立的 JavaScript 文件 -->
-<script src="/js/strategy-options.js"></script>
-<script src="/js/sql-suggestions.js"></script>
+
+<script th:src="@{/strategy-options.js}"></script>
+<script th:src="@{/sql-suggestions.js}"></script>
+
 </body>
 </html>

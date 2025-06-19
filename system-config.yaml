@@ -4,8 +4,8 @@
 #strategyCode : QG238A2JFUFS #高斯数据库测试
 #strategyCode : WPPJQY8J38PS #ocenbase数据库测试
 strategyCode : 41PVNYCLVLAE #本地mysql策略编号
-#configUrl : http://192.168.10.97:9089/enc/v1/gatewayStrategy/getConfig # 策略配置地址
-configUrl : http://127.0.0.1:8084/v1/gatewayStrategy/getConfig
+configUrl : http://192.168.10.97:9089/enc/v1/gatewayStrategy/getConfig # 策略配置地址
+#configUrl : http://127.0.0.1:8084/v1/gatewayStrategy/getConfig
 #configUrl : https://m1.apifoxmock.com/m2/5550113-5227108-default/250637533?apifoxApiId=250637533
 standalone : false #是否离线部署
 localStorage : true #是否本地存储在线配置

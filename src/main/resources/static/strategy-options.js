@@ -5,7 +5,7 @@ window.addEventListener('DOMContentLoaded', function () {
     let currentActiveIndex = -1;
 
     // 加载策略列表
-    fetch('/api/strategies')
+    fetch('/demo/api/strategies')
         .then(response => {
             if (!response.ok) throw new Error('接口调用失败');
             return response.json();

@@ -36,10 +36,9 @@ dependencies {
     implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.5'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-    dependencies {
-        annotationProcessor 'org.projectlombok:lombok'
-    }
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 
 }
 
