@@ -1,6 +1,8 @@
 package com.example.demo.service.spi.impl;
 
 import com.example.demo.service.spi.DatabaseMetadataReader;
+import lombok.extern.slf4j.Slf4j;
+
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,6 +11,7 @@ import java.util.*;
 /**
  * MySQL数据库元数据读取器
  */
+@Slf4j
 public class MySqlMetadataReader implements DatabaseMetadataReader {
 
     private static final String[] TABLE_TYPES = {"TABLE"};
@@ -20,6 +23,7 @@ public class MySqlMetadataReader implements DatabaseMetadataReader {
 
     @Override
     public String extractCatalog(String jdbcUrl) throws SQLException {
+        log.info("MySQL URL: {}", jdbcUrl);
         int lastSlashIndex = jdbcUrl.lastIndexOf("/");
         int queryIndex = jdbcUrl.indexOf("?");
         if (queryIndex == -1) queryIndex = jdbcUrl.length();

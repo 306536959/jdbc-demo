@@ -29,19 +29,24 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'mysql:mysql-connector-java'
-    implementation 'org.postgresql:postgresql'
-    //导入sqlserver
-    implementation 'com.microsoft.sqlserver:mssql-jdbc'
+    // MySQL
+    implementation 'mysql:mysql-connector-java:8.0.33'
+    // PostgreSQL
+    implementation 'org.postgresql:postgresql:42.6.0'
+    // SQL Server
+    implementation 'com.microsoft.sqlserver:mssql-jdbc:12.6.1.jre8'
+    // OpenGauss
+    implementation 'org.opengauss:opengauss-jdbc:3.0.0'
+    // DB2
+    implementation 'com.ibm.db2:jcc:11.5.8.0'
+    implementation 'com.oracle.database.jdbc:ojdbc8:23.6.0.24.10'
+    implementation 'com.dameng:DmJdbcDriver18:8.1.1.193'
     implementation 'com.baomidou:mybatis-plus-spring-boot3-starter:3.5.5'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
-
 }
-
 
 tasks.named('test') {
     useJUnitPlatform()

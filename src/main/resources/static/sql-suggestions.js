@@ -3,6 +3,7 @@ window.addEventListener('DOMContentLoaded', function() {
     const suggestionsContainer = document.getElementById('sqlSuggestions');
     let activeIndex = -1;
     let databaseMetadata = null;
+    const strategyIdInput = document.querySelector('input[name="strategyId"]');
 
     // SQL关键字（固定不变）
     // SQL关键字（固定不变）- 已移除与 sqlFunctions 冲突的项
@@ -32,9 +33,8 @@ window.addEventListener('DOMContentLoaded', function() {
         'IFNULL(?, ?)', 'COALESCE(?, ?)', 'CASE WHEN THEN END'
     ];
     // 连接成功后获取数据库元数据
-    if (document.querySelector('.connection-success')) {
-        const strategyId = document.querySelector('input[name="strategyId"]').value;
-        fetch(`/demo/api/database/metadata?strategyId=${strategyId}`)
+    if (strategyIdInput && strategyIdInput.value) {
+        fetch(`/demo/api/database/metadata?strategyId=${strategyIdInput.value}`)
             .then(response => {
                 if (!response.ok) throw new Error('获取数据库元数据失败');
                 return response.json();
@@ -114,7 +114,7 @@ window.addEventListener('DOMContentLoaded', function() {
         const whereMatch = whereRegex.exec(beforeCursor);
         const inWhereClause = whereMatch !== null;
 
-        // 新增：尝试识别“表名.”后紧接光标的情况（即 . 后面是光标）
+        // 新增：尝试识别"表名."后紧接光标的情况（即 . 后面是光标）
         const dotRegex = /(\w+)\.\s*$/g;  // 匹配类似 "table."
         const dotMatch = dotRegex.exec(beforeCursor);
         const tableAfterDot = dotMatch ? dotMatch[1] : null;

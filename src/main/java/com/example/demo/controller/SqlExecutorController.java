@@ -47,8 +47,10 @@ public class SqlExecutorController {
             model.addAttribute("connectionSuccess", true);
         } catch (SQLException e) {
             model.addAttribute("queryError", "查询错误：" + e.getMessage());
+            model.addAttribute("connectionSuccess", true);
         } catch (Exception e) {
             model.addAttribute("queryError", "执行错误：" + e.getMessage());
+            model.addAttribute("connectionSuccess", true);
         }
         model.addAttribute("connectionInfo", connectionInfo);
         model.addAttribute("sqlQuery", sqlQuery);

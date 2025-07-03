@@ -2,3 +2,7 @@ com.example.demo.service.spi.impl.MySqlMetadataReader
 com.example.demo.service.spi.impl.PostgreSqlMetadataReader
 com.example.demo.service.spi.impl.DB2MetadataReader
 com.example.demo.service.spi.impl.SqlServerMetadataReader
+com.example.demo.service.spi.impl.DmMetadataReader
+com.example.demo.service.spi.impl.OceanBaseMetadataReader
+com.example.demo.service.spi.impl.OpenGaussMetadataReader
+com.example.demo.service.spi.impl.OracleMetadataReader

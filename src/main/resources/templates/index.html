@@ -271,7 +271,7 @@
                        autocomplete="off">
                 <div id="datalistOptions" class="datalist-options"></div>
             </div>
-            <label>代码提示目前仅支持 MySQL PostgreSQL DB2 SqlServer</label>
+            <label>代码提示目前仅支持 MySQL PostgreSQL DB2 SqlServer Oracle Dm OpenGauss OceanBase</label>
             <button type="submit">连接数据源</button>
         </form>
 
@@ -300,7 +300,9 @@
 
         <div class="form-group datalist-container" style="position: relative;">
             <label for="sqlQuery">SQL查询</label>
-                <textarea id="sqlQuery" style="display:none"></textarea>
+            <textarea id="sqlQuery" name="sqlQuery" required
+                      th:text="${sqlQuery} ?: '-- 请输入有效的SQL查询语句'">
+            </textarea>
             <div id="sqlSuggestions" class="sql-suggestions"></div>
         </div>
         <button type="submit">执行SQL</button>

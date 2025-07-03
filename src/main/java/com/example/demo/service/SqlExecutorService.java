@@ -77,7 +77,6 @@ public class SqlExecutorService {
                 result.setSuccess(true);
             }
         } catch (SQLException e) {
-            connectionStatus.put(strategyId, false);
             throw new SQLException("SQL执行失败: " + e.getMessage(), e);
         }
 
