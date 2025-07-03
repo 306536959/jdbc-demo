@@ -2,346 +2,419 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>数据库加密服务jdbc演示</title>
+    <title>数据库加密服务 JDBC 演示平台</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
+            padding: 0;
+            background: #f4f8fb;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
+        .header {
+            background: #2563eb;
+            color: #fff;
+            padding: 36px 0 24px 0;
+            text-align: center;
+            border-bottom: 4px solid #1746a2;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.6em;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+        .main {
+            max-width: 1100px;
+            margin: -32px auto 0 auto;
+            padding: 32px 0 32px 0;
+        }
+        .card {
+            background: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(37,99,235,0.06);
+            margin-bottom: 28px;
+            padding: 32px 36px 28px 36px;
+            border-left: 6px solid #2563eb;
+            position: relative;
         }
-
-        h1 {
-            color: #333;
+        .card-title {
+            font-size: 1.35em;
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-
+        .card-title .icon {
+            font-size: 1.2em;
+            color: #1746a2;
+        }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
-
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 7px;
+            font-weight: 600;
+            color: #1746a2;
         }
-
         input, textarea {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
+            padding: 12px;
+            border: 1px solid #b6c6e3;
             border-radius: 4px;
             box-sizing: border-box;
+            font-size: 1.08em;
+            background: #fafdff;
+            margin-bottom: 2px;
         }
-
         textarea {
-            height: 120px;
+            height: 110px;
             font-family: monospace;
         }
-
         button {
-            background-color: #4CAF50;
+            background: linear-gradient(90deg, #2563eb 0%, #1746a2 100%);
             color: white;
-            padding: 10px 15px;
+            padding: 12px 32px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            margin-right: 10px;
+            font-size: 1.08em;
+            font-weight: 700;
+            margin-top: 8px;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+            transition: background 0.2s;
         }
-
         button:hover {
-            background-color: #45a049;
+            background: linear-gradient(90deg, #1746a2 0%, #2563eb 100%);
         }
-
-        .error {
-            color: #f44336;
-            margin: 10px 0;
+        .divider {
+            border-top: 1px solid #e3eaf2;
+            margin: 28px 0 18px 0;
         }
-
-        .success {
-            color: #4CAF50;
-            margin: 10px 0;
-        }
-
-        .connection-status {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-        }
-
-        .connection-success {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-        }
-
-        .connection-failure {
-            background-color: #ffebee;
-            color: #c62828;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        table, th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            text-align: left;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        /* 增强 datalist 样式 */
-        .datalist-container {
-            position: relative;
-        }
-
-        .datalist-options {
-            position: absolute;
-            z-index: 10;
-            top: 100%;
-            left: 0;
-            right: 0;
-            margin-top: 2px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-height: 200px;
-            overflow-y: auto;
-            display: none;
-        }
-
-        .datalist-option {
-            padding: 8px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
-        }
-
-        .datalist-option:last-child {
-            border-bottom: none;
-        }
-
-        .datalist-option:hover,
-        .datalist-option.active {
-            background-color: #f0f0f0;
-        }
-
-        /* 数据库信息展示样式 */
         .db-info {
-            background-color: #f9f9f9;
-            padding: 15px;
+            background: #f4f8fb;
+            padding: 16px 20px;
             border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-
-        .table-list {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        .table-list li {
-            padding: 6px 12px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
-        }
-
-        .table-list li:hover {
-            background-color: #f0f0f0;
-        }
-
-        .sql-suggestion {
-            padding: 8px 12px;
-            cursor: pointer;
-            font-family: monospace;
-        }
-
-        .sql-suggestion:hover,
-        .sql-suggestion.active {
-            background-color: #f0f0f0;
-        }
-
-        .sql-keyword {
-            color: #007acc;
-            font-weight: bold;
-        }
-
-        .sql-table {
-            color: #28a745;
-        }
-
-        .sql-column {
-            color: #6f42c1;
-        }
-
-        .sql-function {
-            color: #e83e8c;
-        }
-
-        .text-muted {
-            color: #868e96;
-            font-size: 0.8em;
-        }
-
-        #sqlSuggestions {
-            position: absolute;
-            border: 1px solid #ccc;
-            background-color: white;
-            z-index: 1000;
-            max-height: 200px;
-            overflow-y: auto;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            font-size: 14px;
+            border: 1px solid #e3eaf2;
+            margin-bottom: 12px;
         }
         .db-info-row {
             display: flex;
-            flex-wrap: wrap; /* 允许换行 */
+            flex-wrap: wrap;
             gap: 16px;
-            margin-top: 10px;
-            font-size: 14px;
+            font-size: 15px;
         }
-
         .db-info-row span {
-            background-color: #f9f9f9;
-            padding: 6px 10px;
-            border: 1px solid #eee;
+            background: #fff;
+            padding: 7px 14px;
+            border: 1px solid #e3eaf2;
             border-radius: 4px;
+            font-weight: 500;
         }
-
-        /* 可选：用竖线分隔字段 */
-        .db-info-row span:not(:last-child)::after {
-            content: " |";
-            margin-left: 4px;
-            color: #ccc;
+        .table-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
         }
-
-        .db-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .db-info-grid div {
-            background-color: #f9f9f9;
-            padding: 8px 12px;
-            border: 1px solid #eee;
+        .table-list li {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #e3eaf2;
             border-radius: 4px;
+            transition: background 0.15s;
         }
-
-        .text-muted {
-            color: #999;
+        .table-list li:hover {
+            background: #e3f2fd;
         }
-
-        .text-sm {
-            font-size: 0.8em;
+        .connection-status {
+            padding: 10px 18px;
+            margin: 14px 0 0 0;
+            border-radius: 4px;
+            font-size: 1.08em;
         }
-
-        .sql-table {
-            color: #28a745; /* 绿色 */
+        .connection-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .connection-failure {
+            background: #ffebee;
+            color: #c62828;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+            background: #fff;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(33,150,243,0.06);
+        }
+        table, th, td {
+            border: 1px solid #e3eaf2;
+            padding: 10px;
+        }
+        th {
+            background: #e3f2fd;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background: #fafdff;
+        }
+        .error {
+            color: #f44336;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+        .success {
+            color: #4CAF50;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+        @media (max-width: 900px) {
+            .main { padding: 12px 0; }
+            .card { padding: 18px 8px; }
+        }
+        .datalist-container {
+            position: relative;
+        }
+        .datalist-arrow {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            font-size: 1.2em;
+            color: #b6c6e3;
+        }
+        input[list] {
+            appearance: none;
+            -webkit-appearance: none;
+            background: #fafdff;
+            border: 1px solid #b6c6e3;
+            border-radius: 4px;
+            padding-right: 32px;
+            transition: border-color 0.2s;
+        }
+        input[list]:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 2px #2563eb22;
+        }
+        .custom-select-container {
+            position: relative;
+            width: 100%;
+        }
+        .custom-select-container input {
+            width: 100%;
+            padding: 12px 36px 12px 12px;
+            border: 1px solid #b6c6e3;
+            border-radius: 4px;
+            font-size: 1.08em;
+            background: #fafdff;
+        }
+        .custom-select-arrow {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #b6c6e3;
+            font-size: 1.2em;
+        }
+        .custom-select-dropdown {
+            position: absolute;
+            left: 0; right: 0;
+            top: 110%;
+            background: #fff;
+            border: 1px solid #b6c6e3;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+            z-index: 10;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .custom-select-dropdown li {
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .custom-select-dropdown li:hover, .custom-select-dropdown li.active {
+            background: #e3f2fd;
+        }
+        .custom-select-dropdown li.active {
+            background: #2563eb;
+            color: #fff;
         }
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
 <body>
-<div class="container">
-    <h1>数据库加密服务jdbc演示</h1>
-
-
-        <form style="width: 50%" method="post"  th:action="@{/connect}" id="connectForm">
-            <div class="form-group datalist-container">
+<div class="header">
+    <h1>数据库加密服务 JDBC 演示平台</h1>
+</div>
+<div class="main">
+    <div class="card">
+        <div class="card-title"><i class="bi bi-link-45deg icon"></i>连接数据源</div>
+        <form style="max-width: 480px;" method="post"  th:action="@{/connect}" id="connectForm">
+            <div class="form-group">
                 <label for="strategyId">策略ID</label>
-                <input type="text" id="strategyId" name="strategyId"
-                       th:value="${connectionInfo.strategyId}" required
-                       autocomplete="off">
-                <div id="datalistOptions" class="datalist-options"></div>
+                <div class="custom-select-container">
+                    <input type="text" id="strategyId" name="strategyId" autocomplete="off" placeholder="请选择或输入策略ID"
+                           th:value="${connectionInfo.strategyId}" required>
+                    <span class="custom-select-arrow"><i class="bi bi-caret-down-fill"></i></span>
+                    <ul class="custom-select-dropdown" id="strategyDropdown" style="display:none;"></ul>
+                </div>
             </div>
-            <label>代码提示目前仅支持 MySQL PostgreSQL DB2 SqlServer Oracle Dm OpenGauss OceanBase</label>
             <button type="submit">连接数据源</button>
         </form>
-
-        <!-- 数据库信息 -->
-        <div id="dbInfo" class="db-info" style="margin-top: 20px;"></div>
-
-    <!-- 表列表 -->
-    <div id="tableListContainer" style="margin-top: 20px;">
-        <h3>数据库表</h3>
+    </div>
+    <div class="card">
+        <div class="card-title"><i class="bi bi-info-circle icon"></i>数据库信息</div>
+        <div id="dbInfo" class="db-info"></div>
+    </div>
+    <div class="card">
+        <div class="card-title"><i class="bi bi-table icon"></i>数据库表</div>
         <ul id="tableList" class="table-list"></ul>
     </div>
-
-    <!-- 连接状态 -->
-    <div class="connection-status" th:if="${connectionSuccess != null}">
-        <span th:if="${connectionSuccess}" class="connection-success">
-            <strong>连接成功!</strong> 可以执行SQL查询。
-        </span>
-        <span th:if="${!connectionSuccess}" class="connection-failure">
-            <strong>连接失败:</strong> <span th:text="${connectionMessage}"></span>
-        </span>
+    <div class="card">
+        <div class="card-title"><i class="bi bi-terminal icon"></i>SQL 查询</div>
+        <form method="post" th:action="@{/execute}">
+            <input type="hidden" name="strategyId" th:value="${connectionInfo.strategyId}">
+            <div class="form-group datalist-container" style="position: relative;">
+                <label for="sqlQuery">SQL查询</label>
+                <textarea id="sqlQuery" name="sqlQuery" required
+                          th:text="${sqlQuery} ?: '-- 请输入有效的SQL查询语句'">
+                </textarea>
+                <div id="sqlSuggestions" class="sql-suggestions"></div>
+            </div>
+            <button type="submit">执行SQL</button>
+        </form>
     </div>
-
-    <!-- 查询表单 -->
-    <form method="post" th:action="@{/execute}">
-        <input type="hidden" name="strategyId" th:value="${connectionInfo.strategyId}">
-
-        <div class="form-group datalist-container" style="position: relative;">
-            <label for="sqlQuery">SQL查询</label>
-            <textarea id="sqlQuery" name="sqlQuery" required
-                      th:text="${sqlQuery} ?: '-- 请输入有效的SQL查询语句'">
-            </textarea>
-            <div id="sqlSuggestions" class="sql-suggestions"></div>
+    <div class="card">
+        <div class="card-title"><i class="bi bi-check2-square icon"></i>连接状态与结果</div>
+        <div class="connection-status" th:if="${connectionSuccess != null}">
+            <span th:if="${connectionSuccess}" class="connection-success">
+                <strong>连接成功!</strong> 可以执行SQL查询。
+            </span>
+            <span th:if="${!connectionSuccess}" class="connection-failure">
+                <strong>连接失败:</strong> <span th:text="${connectionMessage}"></span>
+            </span>
         </div>
-        <button type="submit">执行SQL</button>
-    </form>
-
-
-
-
-    <!-- 查询错误 -->
-    <div class="error" th:if="${queryError != null}">
-        <strong>查询错误:</strong> <span th:text="${queryError}"></span>
-    </div>
-
-    <!-- 查询结果 -->
-    <div th:if="${queryResult != null}">
-        <h2>查询结果</h2>
-        <div th:if="${queryResult.hasData()}">
-            <table>
-                <thead>
-                <tr>
-                    <th th:each="column : ${queryResult.columnNames}" th:text="${column}"></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="row : ${queryResult.rows}">
-                    <td th:each="cell : ${row}" th:text="${cell}"></td>
-                </tr>
-                </tbody>
-            </table>
+        <div class="error" th:if="${queryError != null}">
+            <strong>查询错误:</strong> <span th:text="${queryError}"></span>
         </div>
-        <div th:if="${!queryResult.hasData()}" class="error">
-            查询执行成功，但没有返回记录。
+        <div th:if="${queryResult != null}">
+            <h2 style="font-size:1.1em;color:#2563eb;margin:12px 0 8px 0;">查询结果</h2>
+            <div th:if="${queryResult.hasData()}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th th:each="column : ${queryResult.columnNames}" th:text="${column}"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${queryResult.rows}">
+                        <td th:each="cell : ${row}" th:text="${cell}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${!queryResult.hasData()}" class="error">
+                查询执行成功，但没有返回记录。
+            </div>
         </div>
     </div>
 </div>
-
-
 <script th:src="@{/strategy-options.js}"></script>
 <script th:src="@{/sql-suggestions.js}"></script>
+<script>
+(function() {
+    const input = document.getElementById('strategyId');
+    const dropdown = document.getElementById('strategyDropdown');
+    const arrow = document.querySelector('.custom-select-arrow');
+    let options = [];
+    let activeIndex = -1;
 
+    // 动态获取策略列表
+    fetch('/demo/api/strategies')
+      .then(res => res.json())
+      .then(data => {
+        // 假设 data 是 [{strategyCode, strategyName}, ...]
+        options = data.map(item => ({ code: item.strategyCode, name: item.strategyName }));
+      });
+
+    function renderDropdown(filter = "") {
+        dropdown.innerHTML = "";
+        const filtered = options.filter(opt => opt.name.includes(filter) || opt.code.includes(filter));
+        filtered.forEach((opt, idx) => {
+            const li = document.createElement('li');
+            li.textContent = `${opt.name}（${opt.code}）`;
+            li.tabIndex = -1;
+            if (idx === activeIndex) li.classList.add('active');
+            li.onmouseenter = () => setActive(idx);
+            li.onclick = () => {
+                input.value = opt.code;
+                dropdown.style.display = 'none';
+                activeIndex = -1;
+            };
+            dropdown.appendChild(li);
+        });
+        dropdown.style.display = filtered.length ? 'block' : 'none';
+    }
+
+    function setActive(idx) {
+        activeIndex = idx;
+        const items = dropdown.querySelectorAll('li');
+        items.forEach((li, i) => li.classList.toggle('active', i === idx));
+    }
+
+    input.addEventListener('focus', () => {
+        activeIndex = -1;
+        renderDropdown(input.value);
+    });
+    input.addEventListener('input', () => {
+        activeIndex = -1;
+        renderDropdown(input.value);
+    });
+    input.addEventListener('blur', () => setTimeout(() => dropdown.style.display = 'none', 200));
+    input.addEventListener('keydown', (e) => {
+        const items = dropdown.querySelectorAll('li');
+        if (!items.length) return;
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeIndex = (activeIndex + 1) % items.length;
+            setActive(activeIndex);
+            items[activeIndex].scrollIntoView({block: 'nearest'});
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeIndex = (activeIndex - 1 + items.length) % items.length;
+            setActive(activeIndex);
+            items[activeIndex].scrollIntoView({block: 'nearest'});
+        } else if (e.key === 'Enter') {
+            if (activeIndex >= 0 && activeIndex < items.length) {
+                input.value = options.filter(opt => opt.name.includes(input.value) || opt.code.includes(input.value))[activeIndex].code;
+                dropdown.style.display = 'none';
+                activeIndex = -1;
+            }
+        }
+    });
+    if (arrow) {
+        arrow.onclick = () => {
+            if (dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+            } else {
+                activeIndex = -1;
+                renderDropdown(input.value);
+                input.focus();
+            }
+        };
+    }
+})();
+</script>
 </body>
 </html>

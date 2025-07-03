@@ -1,6 +1,8 @@
 package com.example.demo.service.spi.impl;
 
 import com.example.demo.service.spi.DatabaseMetadataReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.*;
@@ -8,6 +10,7 @@ import java.util.TimeZone;
 
 public class DB2MetadataReader implements DatabaseMetadataReader {
 
+    private static final Logger log = LoggerFactory.getLogger(DB2MetadataReader.class);
     private static final String[] TABLE_TYPES = {"TABLE"};
 
     @Override
@@ -57,6 +60,13 @@ public class DB2MetadataReader implements DatabaseMetadataReader {
 
     @Override
     public Map<String, Object> readMetadata(DatabaseMetaData metaData, String catalog) throws SQLException {
+        try {
+            Class.forName("com.ibm.db2.jcc.DB2Driver");
+            log.info("DB2 驱动已加载");
+        } catch (ClassNotFoundException e) {
+            log.error("DB2 驱动未找到", e);
+            throw new SQLException("DB2 驱动未找到", e);
+        }
         Map<String, Object> metadata = new HashMap<>();
         List<Map<String, Object>> tables = new ArrayList<>();
 

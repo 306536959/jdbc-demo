@@ -1,6 +1,8 @@
 package com.example.demo.service.spi.impl;
 
 import com.example.demo.service.spi.DatabaseMetadataReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.*;
@@ -8,6 +10,7 @@ import java.util.TimeZone;
 
 public class SqlServerMetadataReader implements DatabaseMetadataReader {
 
+    private static final Logger log = LoggerFactory.getLogger(SqlServerMetadataReader.class);
     private static final String[] TABLE_TYPES = {"TABLE"};
 
     @Override
@@ -37,6 +40,13 @@ public class SqlServerMetadataReader implements DatabaseMetadataReader {
 
     @Override
     public Map<String, Object> readMetadata(DatabaseMetaData metaData, String catalog) throws SQLException {
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            log.info("SQLServer 驱动已加载");
+        } catch (ClassNotFoundException e) {
+            log.error("SQLServer 驱动未找到", e);
+            throw new SQLException("SQLServer 驱动未找到", e);
+        }
         Map<String, Object> metadata = new HashMap<>();
         List<Map<String, Object>> tables = new ArrayList<>();
 

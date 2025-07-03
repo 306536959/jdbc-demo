@@ -5,12 +5,15 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * PostgreSQL数据库元数据读取器
  */
 public class PostgreSqlMetadataReader implements DatabaseMetadataReader {
 
+    private static final Logger log = LoggerFactory.getLogger(PostgreSqlMetadataReader.class);
     private static final String[] TABLE_TYPES = {"TABLE"};
 
     @Override
@@ -33,6 +36,13 @@ public class PostgreSqlMetadataReader implements DatabaseMetadataReader {
 
     @Override
     public Map<String, Object> readMetadata(DatabaseMetaData metaData, String catalog) throws SQLException {
+        try {
+            Class.forName("org.postgresql.Driver");
+            log.info("PostgreSQL 驱动已加载");
+        } catch (ClassNotFoundException e) {
+            log.error("PostgreSQL 驱动未找到", e);
+            throw new SQLException("PostgreSQL 驱动未找到", e);
+        }
         Map<String, Object> metadata = new HashMap<>();
         List<Map<String, Object>> tables = new ArrayList<>();
 

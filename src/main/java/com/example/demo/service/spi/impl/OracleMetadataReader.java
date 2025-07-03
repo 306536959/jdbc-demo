@@ -3,8 +3,11 @@ package com.example.demo.service.spi.impl;
 import com.example.demo.service.spi.DatabaseMetadataReader;
 import java.sql.*;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OracleMetadataReader implements DatabaseMetadataReader {
+    private static final Logger log = LoggerFactory.getLogger(OracleMetadataReader.class);
     private static final String[] TABLE_TYPES = {"TABLE"};
 
     @Override
@@ -36,6 +39,13 @@ public class OracleMetadataReader implements DatabaseMetadataReader {
 
     @Override
     public Map<String, Object> readMetadata(DatabaseMetaData metaData, String catalog) throws SQLException {
+        try {
+            Class.forName("oracle.jdbc.OracleDriver");
+            log.info("Oracle 驱动已加载");
+        } catch (ClassNotFoundException e) {
+            log.error("Oracle 驱动未找到", e);
+            throw new SQLException("Oracle 驱动未找到", e);
+        }
         Map<String, Object> metadata = new HashMap<>();
         List<Map<String, Object>> tables = new ArrayList<>();
         try (ResultSet rs = metaData.getTables(catalog, null, "%", TABLE_TYPES)) {

@@ -1,7 +1,8 @@
 package com.example.demo.service.spi.impl;
 
 import com.example.demo.service.spi.DatabaseMetadataReader;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -11,9 +12,9 @@ import java.util.*;
 /**
  * MySQL数据库元数据读取器
  */
-@Slf4j
 public class MySqlMetadataReader implements DatabaseMetadataReader {
 
+    private static final Logger log = LoggerFactory.getLogger(MySqlMetadataReader.class);
     private static final String[] TABLE_TYPES = {"TABLE"};
 
     @Override
@@ -35,6 +36,13 @@ public class MySqlMetadataReader implements DatabaseMetadataReader {
 
     @Override
     public Map<String, Object> readMetadata(DatabaseMetaData metaData, String catalog) throws SQLException {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            log.info("MySQL 驱动已加载");
+        } catch (ClassNotFoundException e) {
+            log.error("MySQL 驱动未找到", e);
+            throw new SQLException("MySQL 驱动未找到", e);
+        }
         Map<String, Object> metadata = new HashMap<>();
         List<Map<String, Object>> tables = new ArrayList<>();
 

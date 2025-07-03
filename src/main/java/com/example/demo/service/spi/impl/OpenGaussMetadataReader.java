@@ -3,8 +3,11 @@ package com.example.demo.service.spi.impl;
 import com.example.demo.service.spi.DatabaseMetadataReader;
 import java.sql.*;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OpenGaussMetadataReader implements DatabaseMetadataReader {
+    private static final Logger log = LoggerFactory.getLogger(OpenGaussMetadataReader.class);
     private static final String[] TABLE_TYPES = {"TABLE"};
 
     @Override
@@ -25,6 +28,13 @@ public class OpenGaussMetadataReader implements DatabaseMetadataReader {
 
     @Override
     public Map<String, Object> readMetadata(DatabaseMetaData metaData, String catalog) throws SQLException {
+        try {
+            Class.forName("org.opengauss.Driver");
+            log.info("OpenGauss 驱动已加载");
+        } catch (ClassNotFoundException e) {
+            log.error("OpenGauss 驱动未找到", e);
+            throw new SQLException("OpenGauss 驱动未找到", e);
+        }
         Map<String, Object> metadata = new HashMap<>();
         List<Map<String, Object>> tables = new ArrayList<>();
         try (ResultSet rs = metaData.getTables(catalog, null, "%", TABLE_TYPES)) {

@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -21,20 +23,30 @@ public class SqlExecutorService {
     public boolean connect(ConnectionInfo connectionInfo) throws Exception {
         String strategyId = connectionInfo.getStrategyId();
         if (strategyId == null || strategyId.isEmpty()) {
+            log.error("[connect] 策略ID不能为空");
             throw new IllegalArgumentException("策略ID不能为空");
         }
 
         if (dataSources.containsKey(strategyId) && connectionStatus.getOrDefault(strategyId, false)) {
+            log.info("[connect] 策略ID {} 已连接，无需重复连接", strategyId);
             return true;
         }
 
         String url = "KS:strategyCode:" + strategyId;
-        DataSource dataSource = YamlShardingSphereDataSourceFactory.createDataSource(url);
+        log.info("[connect] 尝试创建数据源，策略ID: {}, URL: {}", strategyId, url);
+        DataSource dataSource = null;
+        try {
+            dataSource = YamlShardingSphereDataSourceFactory.createDataSource(url);
+            log.info("[connect] DataSource 创建成功，准备测试连接");
+        } catch (Exception e) {
+            log.error("[connect] DataSource 创建失败，策略ID: {}, URL: {}，异常: {}", strategyId, url, e.getMessage(), e);
+            connectionStatus.put(strategyId, false);
+            throw new Exception("创建数据源失败: " + e.getMessage(), e);
+        }
 
         try (Connection testConn = dataSource.getConnection()) {
-            //获取默认模式名称
             String defaultSchema = testConn.getSchema();
-            log.info("默认模式名称: " + defaultSchema);
+            log.info("[connect] 测试连接成功，默认模式名称: {}", defaultSchema);
             boolean isValid = testConn != null && !testConn.isClosed();
             if (isValid) {
                 dataSources.put(strategyId, dataSource);
@@ -42,10 +54,12 @@ public class SqlExecutorService {
                 return true;
             }
         } catch (SQLException e) {
+            log.error("[connect] 测试连接失败，策略ID: {}, URL: {}，异常: {}", strategyId, url, e.getMessage(), e);
             connectionStatus.put(strategyId, false);
             throw new SQLException("连接数据库失败: " + e.getMessage(), e);
         }
 
+        log.warn("[connect] 未知原因导致连接失败，策略ID: {}", strategyId);
         return false;
     }
 
